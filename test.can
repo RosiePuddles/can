@@ -1,0 +1,26 @@
+(1, 1) half_add(1 A, 1 B) := {
+    -> A ◊ B  / Sum bit
+    -> A & B  / Carry bit
+}
+
+(1, 1) full_add(1 A, 1 B, 1 C) := {
+    1 S1, 1 C1 := half_add(A, B)  / Sum A and B
+    1 S, 1 C2 := half_add(S1, C)  / Sum the sum of A and B with the carry bit
+    1 C := C1 | C2                / Set the final carry
+    -> S                          / Return the sum
+    -> C                          / Return the carry
+}
+
+4 add(4 a, 4 b) := {
+    4 s, 1 c := half_add(a & 1, b & 1)    / Initialise the output variable to the first sum bit and save the carry bit
+    1 s_, c := full_add(a & 2, b & 2, c)  / Get sum and carry of the second bit
+    s := s | (s_ << 1)                    / Add the second sum bit to the total sum
+    s_, c := full_add(a & 4, b & 4, c)    / Continue the pattern for the 3rd and 4th bits
+    s := s | (s_ << 2)
+    s_, c := full_add(a & 8, b & 8, c)
+    s := s | (s_ << 2)
+    -> s
+}
+
+=> v add(0b0110, 0b0011)
+
